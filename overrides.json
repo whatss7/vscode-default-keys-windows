@@ -151,12 +151,12 @@
       {
         "key": "alt+enter",
         "command": "workbench.action.terminal.chat.insertCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
+        "when": "terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
       },
       {
         "key": "alt+enter",
         "command": "workbench.action.terminal.chat.insertFirstCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
+        "when": "terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
       },
       {
         "key": "alt+f12",
@@ -352,16 +352,6 @@
         "when": "terminalFindVisible && terminalHasBeenCreated || terminalFindVisible && terminalProcessSupported"
       },
       {
-        "key": "alt+win+/",
-        "command": "workbench.action.chat.run.prompt",
-        "when": "chatIsEnabled && config.chat.promptFiles"
-      },
-      {
-        "key": "alt+win+/",
-        "command": "workbench.action.chat.run.prompt.current",
-        "when": "chatIsEnabled && config.chat.promptFiles && editorTextFocus && resourceSet && resourceLangId == 'prompt'"
-      },
-      {
         "key": "alt+win+j",
         "command": "notebook.cell.joinBelow",
         "when": "notebookEditorFocused"
@@ -392,7 +382,7 @@
       {
         "key": "ctrl+.",
         "command": "workbench.action.chat.toggleAgentMode",
-        "when": "chatIsEnabled && inChatInput && !chatSessionRequestInProgress && chatLocation == 'panel'"
+        "when": "chatHasToolsAgent && inChatInput && !chatSessionRequestInProgress && chatLocation == 'editing-session'"
       },
       {
         "key": "ctrl+.",
@@ -427,7 +417,12 @@
       {
         "key": "ctrl+/",
         "command": "workbench.action.chat.attachContext",
-        "when": "inChatInput && chatLocation == 'panel'"
+        "when": "inChatInput && chatLocation == 'editor' && chatLocation != 'editing-session' || inChatInput && chatLocation == 'notebook' && chatLocation != 'editing-session' || inChatInput && chatLocation == 'panel' && chatLocation != 'editing-session' || inChatInput && chatLocation == 'terminal' && chatLocation != 'editing-session'"
+      },
+      {
+        "key": "ctrl+/",
+        "command": "workbench.action.chat.editing.attachFiles",
+        "when": "inChatInput && chatLocation == 'editing-session'"
       },
       {
         "key": "ctrl+/",
@@ -613,14 +608,9 @@
         "when": "notebookEditorFocused && notebookOutputFocused"
       },
       {
-        "key": "ctrl+alt+.",
-        "command": "workbench.action.chat.openModelPicker",
-        "when": "chatIsEnabled && inChatInput"
-      },
-      {
         "key": "ctrl+alt+/",
-        "command": "workbench.action.chat.attach.instructions",
-        "when": "chatIsEnabled && config.chat.promptFiles"
+        "command": "workbench.command.prompts.use",
+        "when": "config.chat.promptFiles"
       },
       {
         "key": "ctrl+alt+b",
@@ -673,13 +663,18 @@
       },
       {
         "key": "ctrl+alt+enter",
+        "command": "workbench.action.chat.sendToChatEditing",
+        "when": "chatEditingParticipantRegistered && chatInputHasText && chatIsEnabled && chatRequestIsPaused && !chatInputHasAgent && chatLocation != 'editing-session' && chatLocation != 'editor' || chatEditingParticipantRegistered && chatInputHasText && chatIsEnabled && !chatInputHasAgent && !chatSessionRequestInProgress && chatLocation != 'editing-session' && chatLocation != 'editor' || chatEditingParticipantRegistered && chatInstructionsAttached && chatIsEnabled && chatRequestIsPaused && !chatInputHasAgent && chatLocation != 'editing-session' && chatLocation != 'editor' || chatEditingParticipantRegistered && chatInstructionsAttached && chatIsEnabled && !chatInputHasAgent && !chatSessionRequestInProgress && chatLocation != 'editing-session' && chatLocation != 'editor'"
+      },
+      {
+        "key": "ctrl+alt+enter",
         "command": "workbench.action.terminal.chat.insertCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
+        "when": "terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
       },
       {
         "key": "ctrl+alt+enter",
         "command": "workbench.action.terminal.chat.insertFirstCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
+        "when": "terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
       },
       {
         "key": "ctrl+alt+f",
@@ -698,8 +693,7 @@
       },
       {
         "key": "ctrl+alt+i",
-        "command": "workbench.action.chat.open",
-        "when": "!chatSetupDisabled && !chatSetupHidden"
+        "command": "workbench.action.chat.open"
       },
       {
         "key": "ctrl+alt+i",
@@ -792,11 +786,6 @@
         "when": "hasSpeechProvider && !editorReadonly && !speechToTextInProgress"
       },
       {
-        "key": "ctrl+alt+win+/",
-        "command": "workbench.action.chat.run-in-new-chat.prompt.current",
-        "when": "chatIsEnabled && config.chat.promptFiles && editorTextFocus && resourceSet && resourceLangId == 'prompt'"
-      },
-      {
         "key": "ctrl+alt+win+n",
         "command": "welcome.showNewFileEntries"
       },
@@ -812,12 +801,12 @@
       {
         "key": "ctrl+backspace",
         "command": "chatEditing.discardAllFiles",
-        "when": "hasUndecidedChatEditingResource && inChatInput && !chatInputHasText && !chatSessionRequestInProgress"
+        "when": "hasUndecidedChatEditingResource && inChatInput && !chatInputHasText && !chatSessionRequestInProgress && chatLocation == 'editing-session'"
       },
       {
         "key": "ctrl+backspace",
-        "command": "inlineChat2.undo",
-        "when": "inlineChatHasEditsAgent && inlineChatVisible && !chatEdits.isRequestInProgress"
+        "command": "chatEditor.action.reject",
+        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+backspace",
@@ -1093,11 +1082,6 @@
       },
       {
         "key": "ctrl+enter",
-        "command": "mergeEditor.acceptMerge",
-        "when": "isMergeEditor"
-      },
-      {
-        "key": "ctrl+enter",
         "command": "openReferenceToSide",
         "when": "listFocus && referenceSearchVisible && !inputFocus && !treeElementCanCollapse && !treeElementCanExpand && !treestickyScrollFocused"
       },
@@ -1108,8 +1092,8 @@
       },
       {
         "key": "ctrl+enter",
-        "command": "workbench.action.chat.submitWithCodebase",
-        "when": "chatInputHasText && chatRequestIsPaused && inChatInput || chatInputHasText && inChatInput && !chatSessionRequestInProgress || chatPromptFileAttached && chatRequestIsPaused && inChatInput || chatPromptFileAttached && inChatInput && !chatSessionRequestInProgress"
+        "command": "workbench.action.chat.submitSecondaryAgent",
+        "when": "chatInputHasText && chatRequestIsPaused && inChatInput && !chatInputHasAgent || chatInputHasText && inChatInput && !chatInputHasAgent && !chatSessionRequestInProgress || chatInstructionsAttached && chatRequestIsPaused && inChatInput && !chatInputHasAgent || chatInstructionsAttached && inChatInput && !chatInputHasAgent && !chatSessionRequestInProgress"
       },
       {
         "key": "ctrl+enter",
@@ -1134,7 +1118,12 @@
       {
         "key": "ctrl+enter",
         "command": "chatEditing.acceptAllFiles",
-        "when": "hasUndecidedChatEditingResource && inChatInput && !chatSessionRequestInProgress"
+        "when": "hasUndecidedChatEditingResource && inChatInput && !chatSessionRequestInProgress && chatLocation == 'editing-session'"
+      },
+      {
+        "key": "ctrl+enter",
+        "command": "chatEditor.action.accept",
+        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+enter",
@@ -1145,11 +1134,6 @@
         "key": "ctrl+enter",
         "command": "explorer.openToSide",
         "when": "explorerViewletFocus && foldersViewVisible && !inputFocus"
-      },
-      {
-        "key": "ctrl+enter",
-        "command": "inlineChat2.keep",
-        "when": "inlineChatHasEditsAgent && inlineChatVisible && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+enter",
@@ -1179,12 +1163,12 @@
       {
         "key": "ctrl+enter",
         "command": "workbench.action.terminal.chat.runCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || chatIsEnabled && terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
+        "when": "terminalChatResponseContainsCodeBlock && terminalHasBeenCreated && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks || terminalChatResponseContainsCodeBlock && terminalProcessSupported && !terminalChatActiveRequest && !terminalChatResponseContainsMultipleCodeBlocks"
       },
       {
         "key": "ctrl+enter",
         "command": "workbench.action.terminal.chat.runFirstCommand",
-        "when": "chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || chatIsEnabled && terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
+        "when": "terminalChatResponseContainsMultipleCodeBlocks && terminalHasBeenCreated && !terminalChatActiveRequest || terminalChatResponseContainsMultipleCodeBlocks && terminalProcessSupported && !terminalChatActiveRequest"
       },
       {
         "key": "ctrl+enter",
@@ -1371,11 +1355,6 @@
       },
       {
         "key": "ctrl+i",
-        "command": "settings.action.toggleAiSearch",
-        "when": "inSettingsEditor"
-      },
-      {
-        "key": "ctrl+i",
         "command": "focusSuggestion",
         "when": "suggestWidgetVisible && textInputFocus && !suggestWidgetHasFocusedSuggestion"
       },
@@ -1396,13 +1375,13 @@
       },
       {
         "key": "ctrl+i",
-        "command": "inlineChat2.close",
-        "when": "inlineChatHasEditsAgent && inlineChatVisible && !chatEdits.isRequestInProgress && chatEdits.requestCount == '0' || inlineChatHasEditsAgent && inlineChatVisible && !chatEdits.hasEditorModifications && !chatEdits.isRequestInProgress && chatEdits.requestCount == '0'"
+        "command": "inlineChat2.reveal",
+        "when": "inlineChatHasEditsAgent && !chatEdits.isGlobalEditingSession && chatEdits.requestCount >= 1"
       },
       {
         "key": "ctrl+i",
-        "command": "inlineChat2.reveal",
-        "when": "inlineChatHasEditsAgent && !chatEdits.isGlobalEditingSession && chatEdits.requestCount >= 1"
+        "command": "inlineChat2.stop",
+        "when": "inlineChatHasEditsAgent && inlineChatVisible && chatEdits.requestCount == '0'"
       },
       {
         "key": "ctrl+i",
@@ -1411,13 +1390,8 @@
       },
       {
         "key": "ctrl+i",
-        "command": "search.action.searchWithAI",
-        "when": "hasAIResultProviderKey && searchViewletFocus"
-      },
-      {
-        "key": "ctrl+i",
         "command": "workbench.action.chat.holdToVoiceChatInChatView",
-        "when": "chatIsEnabled && hasSpeechProvider && !chatSessionRequestInProgress && !editorFocus && !inChatInput && !inlineChatFocused && !notebookEditorFocused && !searchViewletFocus"
+        "when": "chatIsEnabled && hasSpeechProvider && !chatSessionRequestInProgress && !editorFocus && !inChatInput && !inlineChatFocused && !notebookEditorFocused"
       },
       {
         "key": "ctrl+i",
@@ -1437,7 +1411,7 @@
       {
         "key": "ctrl+i",
         "command": "workbench.action.terminal.chat.start",
-        "when": "chatIsEnabled && terminalChatAgentRegistered && terminalFocusInAny && terminalHasBeenCreated || chatIsEnabled && terminalChatAgentRegistered && terminalFocusInAny && terminalProcessSupported"
+        "when": "terminalChatAgentRegistered && terminalFocusInAny && terminalHasBeenCreated || terminalChatAgentRegistered && terminalFocusInAny && terminalProcessSupported"
       },
       {
         "key": "ctrl+i",
@@ -1948,7 +1922,12 @@
       {
         "key": "ctrl+l",
         "command": "workbench.action.chat.newChat",
-        "when": "chatEditingParticipantRegistered && chatIsEnabled && inChat"
+        "when": "chatIsEnabled && inChat && chatLocation != 'editing-session'"
+      },
+      {
+        "key": "ctrl+l",
+        "command": "workbench.action.chat.newEditSession",
+        "when": "chatEditingParticipantRegistered && chatIsEnabled && inChat && chatLocation == 'editing-session'"
       },
       {
         "key": "ctrl+left",
@@ -1982,11 +1961,6 @@
       {
         "key": "ctrl+n",
         "command": "workbench.action.files.newUntitledFile"
-      },
-      {
-        "key": "ctrl+n",
-        "command": "chatEditor.action.undoHunk",
-        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress || chatEdits.hasEditorModifications && notebookCellListFocused && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+numpad0",
@@ -2108,7 +2082,7 @@
       {
         "key": "ctrl+r",
         "command": "workbench.action.terminal.chat.rerunRequest",
-        "when": "chatIsEnabled && terminalChatFocus && terminalHasBeenCreated && !terminalChatActiveRequest || chatIsEnabled && terminalChatFocus && terminalProcessSupported && !terminalChatActiveRequest"
+        "when": "terminalChatFocus && terminalHasBeenCreated && !terminalChatActiveRequest || terminalChatFocus && terminalProcessSupported && !terminalChatActiveRequest"
       },
       {
         "key": "ctrl+r",
@@ -2133,7 +2107,7 @@
       {
         "key": "ctrl+right",
         "command": "editor.action.inlineSuggest.acceptNextWord",
-        "when": "inlineSuggestionVisible && !accessibilityModeEnabled && !editorReadonly"
+        "when": "inlineSuggestionVisible && !editorReadonly"
       },
       {
         "key": "ctrl+right",
@@ -2303,6 +2277,11 @@
         "when": "inSearchEditor"
       },
       {
+        "key": "ctrl+shift+backspace",
+        "command": "chatEditor.action.undoHunk",
+        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress"
+      },
+      {
         "key": "ctrl+shift+c",
         "command": "workbench.action.terminal.copySelection",
         "when": "terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused"
@@ -2354,6 +2333,11 @@
       },
       {
         "key": "ctrl+shift+enter",
+        "command": "chatEditor.action.acceptHunk",
+        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress"
+      },
+      {
+        "key": "ctrl+shift+enter",
         "command": "list.toggleSelection",
         "when": "listFocus && !inputFocus && !treestickyScrollFocused"
       },
@@ -2375,7 +2359,7 @@
       {
         "key": "ctrl+shift+enter",
         "command": "workbench.action.chat.sendToNewChat",
-        "when": "chatInputHasText && chatRequestIsPaused && inChatInput || chatInputHasText && inChatInput && !chatSessionRequestInProgress || chatPromptFileAttached && chatRequestIsPaused && inChatInput || chatPromptFileAttached && inChatInput && !chatSessionRequestInProgress"
+        "when": "chatInputHasText && chatRequestIsPaused && inChatInput || chatInputHasText && inChatInput && !chatSessionRequestInProgress || chatInstructionsAttached && chatRequestIsPaused && inChatInput || chatInstructionsAttached && inChatInput && !chatSessionRequestInProgress"
       },
       {
         "key": "ctrl+shift+f",
@@ -2437,8 +2421,13 @@
       },
       {
         "key": "ctrl+shift+i",
-        "command": "workbench.action.chat.openAgent",
-        "when": "config.chat.agent.enabled && !chatSetupDisabled && !chatSetupHidden"
+        "command": "workbench.action.chat.openEditSession",
+        "when": "chatEditingParticipantRegistered && view != 'workbench.panel.chat.view.edits'"
+      },
+      {
+        "key": "ctrl+shift+i",
+        "command": "workbench.panel.chatEditing",
+        "when": "workbench.panel.chat.view.edits.active"
       },
       {
         "key": "ctrl+shift+i",
@@ -2493,11 +2482,6 @@
       {
         "key": "ctrl+shift+n",
         "command": "workbench.action.newWindow"
-      },
-      {
-        "key": "ctrl+shift+n",
-        "command": "chatEditor.action.reject",
-        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress || chatEdits.hasEditorModifications && notebookEditorFocused && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+shift+o",
@@ -2585,11 +2569,6 @@
         "command": "workbench.action.reopenClosedEditor"
       },
       {
-        "key": "ctrl+shift+t",
-        "command": "mergeEditor.toggleBetweenInputs",
-        "when": "isMergeEditor"
-      },
-      {
         "key": "ctrl+shift+u",
         "command": "workbench.action.output.toggleOutput",
         "when": "workbench.panel.output.active"
@@ -2637,11 +2616,6 @@
         "key": "ctrl+shift+y",
         "command": "workbench.debug.action.toggleRepl",
         "when": "workbench.panel.repl.view.active"
-      },
-      {
-        "key": "ctrl+shift+y",
-        "command": "chatEditor.action.accept",
-        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress || chatEdits.hasEditorModifications && notebookEditorFocused && !chatEdits.isRequestInProgress"
       },
       {
         "key": "ctrl+shift+z",
@@ -2816,11 +2790,6 @@
         "command": "redo"
       },
       {
-        "key": "ctrl+y",
-        "command": "chatEditor.action.acceptHunk",
-        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isRequestInProgress || chatEdits.hasEditorModifications && notebookCellListFocused && !chatEdits.isRequestInProgress"
-      },
-      {
         "key": "ctrl+z",
         "command": "undo"
       },
@@ -2871,8 +2840,13 @@
       },
       {
         "key": "delete",
+        "command": "workbench.action.chat.remove",
+        "when": "inChat && !inChatInput && chatLocation != 'editing-session'"
+      },
+      {
+        "key": "delete",
         "command": "workbench.action.chat.undoEdits",
-        "when": "inChat && !textInputFocus"
+        "when": "inChat && !inChatInput && chatLocation == 'editing-session'"
       },
       {
         "key": "delete",
@@ -2942,12 +2916,12 @@
       {
         "key": "enter",
         "command": "workbench.action.chat.submit",
-        "when": "inChatInput && chatMode == 'ask'"
+        "when": "chatInputHasText && chatRequestIsPaused && inChatInput && chatLocation != 'editing-session' || chatInputHasText && inChatInput && !chatSessionRequestInProgress && chatLocation != 'editing-session' || chatInstructionsAttached && chatRequestIsPaused && inChatInput && chatLocation != 'editing-session' || chatInstructionsAttached && inChatInput && !chatSessionRequestInProgress && chatLocation != 'editing-session'"
       },
       {
         "key": "enter",
         "command": "workbench.action.edits.submit",
-        "when": "inChatInput && chatMode != 'ask'"
+        "when": "chatInputHasText && chatRequestIsPaused && inChatInput && chatLocation == 'editing-session' || chatInputHasText && inChatInput && !chatSessionRequestInProgress && chatLocation == 'editing-session' || chatInstructionsAttached && chatRequestIsPaused && inChatInput && chatLocation == 'editing-session' || chatInstructionsAttached && inChatInput && !chatSessionRequestInProgress && chatLocation == 'editing-session'"
       },
       {
         "key": "enter",
